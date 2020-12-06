@@ -1,34 +1,22 @@
 import fileinput
 
-lines = [x.strip() for x in fileinput.input()]
-lines.append("")
-
-s = set()
-groups = []
-fline = True
-for line in lines:
-    if line == "":  # end of group
-        groups.append(s.copy())
-        s = set()
-        fline = True
-
-    else:
-        if fline:  # First round
-            fline = False
-            for ch in line:
-                s.add(ch)
-
-        else:
-            next = set()
-            for ch in line:
-                if ch in s:
-                    next.add(ch)
-
-            s = next.copy()
+groups = [x.split("\n") for x in open(0).read().strip().split("\n\n")]
 
 p1 = 0
-for g in groups:
-    p1 += len(g)
+p2 = 0
+s1 = set()
+for group in groups:
+    s1 = set(group[0])  # First in the group
+    s2 = s1.copy()
+    for other in group[1:]:
+        s1 = s1 | set(other)
+        s2 = s2 & set(other)
 
+    p1 += len(s1)
+    p2 += len(s2)
 
-print(p1)
+    # print(f"group: {group} => s1: {s1}")
+    # print(f"group: {group} => s2: {s2}")
+
+print("p1:", p1)
+print("p2:", p2)
