@@ -25,8 +25,8 @@ for line in lines:
         parts = rem.strip().split(" ")
         num = int(parts[0])
         col = " ".join(parts[1:-1])
-        # holds.append((num, col))
-        holds.append(col)
+        holds.append((num, col))
+        # holds.append(col)
 
     info[bag] = holds
 
@@ -53,11 +53,25 @@ while len(queue) > 0:
 
     can_hold(bag)
 
+print(info["shiny gold"])
 
+
+def cont(bag):
+    print(f"looking for bags {bag} carry")
+    res = 1
+    if bag not in info:
+        return 1
+    for (num, col) in info[bag]:
+        res += num * cont(col)
+
+    return res
+
+
+p2 = cont("shiny gold")
 # print(res)
 # print(can_hold("shiny gold"))
 
 
 # print(info)
 print("p1:", len(res))
-print("p2:", p2)
+print("p2:", p2 - 1)
