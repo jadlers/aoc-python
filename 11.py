@@ -5,6 +5,14 @@ import itertools
 
 rows = [[y for y in x.strip()] for x in fileinput.input()]
 
+# Correct answers:
+# p1: 2303
+# p2: 2057
+
+# Since the input is modified I cannot solve both P1 and P2 in the same go, I
+# could keep a copy but haven't done it.
+P2 = False  # Set True to solve P2
+
 
 def occupied(m):
     diff = [
@@ -22,47 +30,51 @@ def occupied(m):
     for (row, rv) in enumerate(m):
         res[row] = [0] * len(rv)
         for (col, cv) in enumerate(rv):
-            # print(f"Now at {r, c}")
+            if cv == ".":
+                continue
+
             for (dr, dc) in diff:
-                # print(f"row={row} col={col} dr={dr} dc={dc}", end=" ")
-                r = row + dr
-                c = col + dc
-                if r < 0 or r >= len(m):
-                    # print()
-                    continue
-                if c < 0 or c >= len(m[0]):
-                    # print()
-                    continue
+                max_ = 1
+                r = row
+                c = col
 
-                # print(f"m[{r}][{c}] = {m[r][c]}")
-                if m[r][c] == "#":
-                    res[row][col] += 1
+                while True and max_ > 0:  # Break when non '.' found or out of bounds
+                    if not P2:
+                        max_ = 0
 
-    # print(f"r={r} c={c}")
-    # for row in res:
-    #     print(row)
+                    r += dr
+                    c += dc
+                    if r < 0 or r >= len(m):
+                        break
+                    elif c < 0 or c >= len(m[0]):
+                        break
+
+                    if m[r][c] == "#":
+                        res[row][col] += 1
+                        break
+                    elif m[r][c] == "L":
+                        break
+
     return res
 
 
 def step(m):
+    global P2
+
     occ = occupied(m)
+    req = 5 if P2 else 4
     for (row, rv) in enumerate(m):
         for (col, cv) in enumerate(rv):
-            # print(occ[row][col])
             if cv == "L" and occ[row][col] == 0:
                 m[row][col] = "#"
-            elif cv == "#" and occ[row][col] >= 4:
+            elif cv == "#" and occ[row][col] >= req:
                 m[row][col] = "L"
 
     return occ  # m modified in place
 
 
-p1 = 0
-p2 = 0
-
-# print(occupied(rows, 0, 0))
-
 prev_occ = step(rows)
+
 while True:
     occ = step(rows)
     if prev_occ == occ:
@@ -70,14 +82,8 @@ while True:
     prev_occ = occ
 
 
+res = 0
 for row in rows:
-    p1 += row.count("#")
-# prev_occ = step(rows)
-# for row in rows:
-#     print(row)
-# for col in row:
-#     break
-# print(adjacent(row, col))
+    res += row.count("#")
 
-print("p1:", p1)
-print("p2:", p2)
+print("p2:" if P2 else "p1:", res)
