@@ -7,6 +7,20 @@ y = 0
 
 facing = 90
 
+
+def fdir(degree):
+    if degree == 0:
+        return "N"
+    elif degree == 90:
+        return "E"
+    elif degree == 180:
+        return "S"
+    elif degree == 270:
+        return "W"
+
+    return None
+
+
 n = 0
 e = 0
 w = 0
@@ -20,16 +34,16 @@ for (d, l) in lines:
     # if n < 20:
     #     print(f"{x}\t{y}\t{dir_}\t({d} {l})")
 
-    if d == "N" or d == "F" and facing == 0:
+    if d == "N" or (d == "F" and fdir(facing) == "N"):
         y += l
         n += l
-    elif d == "E" or d == "F" and facing == 90:
+    elif d == "E" or (d == "F" and fdir(facing) == "E"):
         x += l
         e += l
-    elif d == "S" or d == "F" and facing == 180:
+    elif d == "S" or (d == "F" and fdir(facing) == "S"):
         y -= l
         s += l
-    elif d == "W" or d == "F" and facing == 270:
+    elif d == "W" or (d == "F" and fdir(facing) == "W"):
         x -= l
         w += l
     elif d == "R":
