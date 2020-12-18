@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+from functools import reduce
 import fileinput
 import sys
 
@@ -14,18 +15,15 @@ s = [y for y in s if y != " "]
 
 
 def apply(lhs, op, rhs):
-    if not lhs:
-        return rhs
-
     # print(f"lhs={lhs} op={op} rhs={rhs}")
+    if not lhs:
+        return rhs, None
+
     if op == "+":
         lhs += rhs
-        return lhs
+        return lhs, None
     elif op == "*":
-        lhs *= rhs
-        return lhs
-
-    assert False
+        return rhs, lhs
 
 
 def calc(exp, start_i=None):
@@ -33,6 +31,7 @@ def calc(exp, start_i=None):
     i = 0
     lhs = None
     op = None
+    mul_nums = []
 
     while i < len(exp):
         e = exp[i]
@@ -40,25 +39,40 @@ def calc(exp, start_i=None):
             # Evaluate a sub expression
             # print(f"begin sub expression, lhs={lhs} op={op}")
             rhs, i = calc(exp[i + 1 :], i)
-            lhs = apply(lhs, op, rhs)
+            lhs, mul = apply(lhs, op, rhs)
+            # print(lhs, mul)
+            if mul:
+                mul_nums.append(mul)
 
         elif start_i != None and e == ")":
             # print("end of this exp at", i)
+
+            mul_nums.append(lhs)
+            if len(mul_nums) > 1:
+                lhs = reduce(lambda x, y: x * y, mul_nums)
             return lhs, start_i + i + 1
         elif e in ["*", "+"]:
             # Set operation
             op = e
         else:
             rhs = int(e)
-            lhs = apply(lhs, op, rhs)
+            lhs, mul = apply(lhs, op, rhs)
+            # print(lhs, mul)
+            if mul:
+                mul_nums.append(mul)
 
+        # print(f"lhs={lhs} op={op} rhs={rhs}")
         i += 1
 
-    return lhs, None
+    mul_nums.append(lhs)
+
+    # print(mul_nums)
+    res = reduce(lambda x, y: x * y, mul_nums)
+    return res, None
 
 
-print(calc(s))
-sys.exit(0)
+# print(calc(s))
+# sys.exit(0)
 
 p1 = 0
 for line in lines:
@@ -67,4 +81,7 @@ for line in lines:
     print(c)
     p1 += c
 
+# 1252139 too low
 print("p1:", p1)
+
+# p2: 65658760783597
