@@ -1,4 +1,7 @@
-import fileinput
+import sys
+
+# From Jonathan Paulson
+filename = sys.argv[1] if len(sys.argv) > 1 else "2.in"
 
 coll = {
     "aim": 0,
@@ -6,10 +9,8 @@ coll = {
     "down": 0,
 }
 
-
-lines = [x.strip() for x in fileinput.input()]
-for line in lines:
-    dir, dist = line.split(" ")
+for line in open(filename):
+    dir, dist = line.strip().split()
     dist = int(dist)
 
     if dir not in coll:
@@ -27,9 +28,6 @@ for line in lines:
     print(coll)
 
 
-# commands = [(dir, int(dist) for (dir, dist) in lines]
-# lines = [[(y[0], y[1]) for y in x.strip().split()] for x in fileinput.input()]
-print(lines)
 print(coll)
 
 p2 = coll["forward"] * (coll["down"] - coll["up"])
