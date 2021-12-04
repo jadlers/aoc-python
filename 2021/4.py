@@ -91,11 +91,31 @@ def part1(nums):
                 s = sum(unchecked)
                 return s * num
 
-def part2():
-    pass
+def part2(nums):
+    for num in nums:
+        rem = []
+        if len(boards) < 2:
+            b = boards[0]
+            won = b.mark(num)
+            # print(b)
+            if won:
+                unchecked = b.get_unchecked()
+                s = sum(unchecked)
+                return s * num
+
+        for b in boards:
+            won = b.mark(num)
+            # print(b)
+            if won:
+                rem.append(b)
+
+        for r in rem:
+            boards.remove(r)
+            rem = []
 
 
 p1 = part1(nums)
+p2 = part2(nums)
 
-print(f'p1={p1}')
-print(f'p2={p2}')
+print(f"p1={p1}")
+print(f"p2={p2}")
