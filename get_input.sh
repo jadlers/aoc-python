@@ -33,5 +33,5 @@ fi
 
 curl "https://adventofcode.com/$year/day/${day}/input" -H "$cookie" --compressed \
   --output "$year/$day.in"
-head "$year/$day"
+head "$year/$day.in"
 
