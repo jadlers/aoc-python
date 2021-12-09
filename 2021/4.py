@@ -5,8 +5,6 @@ filename = sys.argv[1] if len(sys.argv) > 1 else "2.in"
 p1 = 0
 p2 = 0
 
-# class Num:
-#     def __init__(self, num)
 
 class Board:
     def __init__(self, rows):
@@ -15,10 +13,10 @@ class Board:
     def __str__(self):
         s = ""
         for row in self._rows:
-            s = s+str(row)+'\n'
+            s = s + str(row) + "\n"
             # print(s)
         return s
-    
+
     def mark(self, num):
         for i, row in enumerate(self._rows):
             try:
@@ -27,7 +25,6 @@ class Board:
                 return self.won()
             except ValueError:
                 pass
-
 
     def won(self):
         for row in self._rows:
@@ -52,15 +49,14 @@ class Board:
         return res
 
 
-
 nums = []
 boards = []
 board = []
-for i,line in enumerate(open(filename)):
+for i, line in enumerate(open(filename)):
     if i == 0:
-        nums = [int(x) for x in line.strip().split(',')]
+        nums = [int(x) for x in line.strip().split(",")]
         continue
-    elif i ==1:
+    elif i == 1:
         continue
 
     # Boards
@@ -75,7 +71,7 @@ for i,line in enumerate(open(filename)):
 boards.append(board)
 
 
-for i,b in enumerate(boards):
+for i, b in enumerate(boards):
     boards[i] = Board(b)
     # print(boards[i])
 
@@ -90,6 +86,7 @@ def part1(nums):
                 unchecked = b.get_unchecked()
                 s = sum(unchecked)
                 return s * num
+
 
 def part2(nums):
     for num in nums:

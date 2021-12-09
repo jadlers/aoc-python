@@ -29,7 +29,7 @@ for y in range(len(rows)):
         if is_low(y, x):
             lows.append((x, y))
 
-p1 = sum([rows[y][x] for (x,y) in lows]) + len(lows)
+p1 = sum([rows[y][x] for (x, y) in lows]) + len(lows)
 
 # For P2 do a breadth first search-ish for the low points until edge/9
 def basin_size(x_init, y_init):

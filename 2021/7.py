@@ -5,8 +5,10 @@ filename = sys.argv[1] if len(sys.argv) > 1 else "2.in"
 p1 = []
 p2 = []
 
+
 def dist_cost(n):
-    return n*(n+1)/2 # Compute instead of store
+    return n * (n + 1) / 2  # Compute instead of store
+
 
 xs = [int(x) for x in open(filename).readline().strip().split(",")]
 hi = max(xs)
