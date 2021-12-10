@@ -5,22 +5,27 @@ from collections import deque
 filename = sys.argv[1] if len(sys.argv) > 1 else "2.in"
 
 p1 = 0
-p2 = 0
+p2 = []
 
 match = {
     ")": "(",
     "}": "{",
     "]": "[",
     ">": "<",
+    "(": ")",
+    "{": "}",
+    "[": "]",
+    "<": ">",
 }
 
-# STUPID ME SWAPPED ']' and '}' in scoring...
-points = {
+points1 = {
     ")": 3,
     "]": 57,
     "}": 1197,
     ">": 25137,
 }
+
+points2 = {")": 1, "]": 2, "}": 3, ">": 4}
 
 
 def find_corruption(line):
@@ -31,35 +36,39 @@ def find_corruption(line):
         else:  # Match with last opening symbol
             l = q.pop()
             if l != match[ch]:
-                # print(f'{line} should match={l} got={ch}')
-                print(f"should got={ch} score={points[ch]}")
-                return idx, ch
-    # if len(q) != 0: print('unmatched', q)
-    if len(q) != 0:
-        print("incomplete")
-    return -1, " "
+                # print(f'should match={l} got={ch} score={points1[ch]}')
+                return idx, ch, q
+    return -1, " ", q
 
 
 assert find_corruption("([])")[0] == -1
 assert find_corruption("{()()()}")[0] == -1
 assert find_corruption("<([{}])>")[0] == -1
 assert find_corruption("[<>({}){}[([])<>]]")[0] == -1
-# assert find_corruption("<([]){()}[{}])") == (13, ')')
 
 
-errs = {}
+incomplete = []
 for i, line in enumerate(open(filename)):
     line = line.strip()
-    idx, ch = find_corruption(line)
+    idx, ch, _ = find_corruption(line)
     # print(f"#{i+1:3d} {idx:3d}", ch, line)
     if idx != -1:
-        if ch not in errs:
-            errs[ch] = 1
-        else:
-            errs[ch] += 1
-        p1 += points[ch]
+        p1 += points1[ch]
+    else:
+        incomplete.append(line)
 
-print("alt p1:", sum([points[ch] * n for ch, n in errs.items()]), errs)
+for line in incomplete:
+    _, _, q = find_corruption(line)
+    q.reverse()
+    score = 0
+    for ch in q:
+        score *= 5
+        score += points2[match[ch]]
+    # print(q, score)
+    p2.append(score)
+
+p2.sort()
+p2 = p2[len(p2) // 2]
 
 
 print(f"p1={p1}")  # NOT 333603 (too low)
