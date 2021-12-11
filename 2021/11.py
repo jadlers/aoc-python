@@ -13,9 +13,12 @@ C = len(O[0])
 DR = [-1, -1, -1, 0, 0, 1, 1, 1]
 DC = [-1, 0, 1, -1, 1, -1, 0, 1]
 
-for row in O:
-    print(row)
-print()
+
+def show():
+    global O
+    for row in O:
+        print(row)
+    print()
 
 
 def flash(o, r, c):
@@ -29,9 +32,15 @@ def flash(o, r, c):
                 flash(o, rr, cc)
 
 
-for _ in range(100):  # range 100
-    flashed = [[False for _ in range(R)] for _ in range(C)]
+def has_val(O):
+    for r in O:
+        for c in r:
+            if c > 0:
+                return True
+    return False
 
+
+while has_val(O):
     # Increase each octopus value
     for r in range(R):
         for c in range(C):
@@ -39,19 +48,15 @@ for _ in range(100):  # range 100
             if O[r][c] == 10:
                 flash(O, r, c)
 
-    # Reset all with value >= 9 and reset
+    # Reset all with value > 9
     for r in range(R):
         for c in range(C):
             if O[r][c] > 9:
-                p1 += 1
+                if p2 < 100:
+                    p1 += 1
                 O[r][c] = 0
 
-    for row in O:
-        print(row)
-    print()
-
-# for line in open(filename):
-#     line = line.strip()
+    p2 += 1
 
 
 print(f"p1={p1}")
