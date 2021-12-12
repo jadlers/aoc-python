@@ -39,25 +39,51 @@ for line in open(filename):
 # Could remove all entries where a small cave only have connection to **one**
 # small cave
 
+def included_twice(s, visited):
+    """Returns True if state `s` is included twice in `visited`, False otherwise"""
+    try:
+        idx = visited.index(s)
+        return visited[idx+1] == s
+    except(ValueError):
+        return False # Not included at all
+    except(IndexError):
+        return False # Last in list i.e. exists once
+
+
 def step(paths):
     """Take one step from each path in `paths` and return the new paths"""
     done = []
     next = []
     for path in paths:
         visited = [x for x in path if x[0] in LOWER] # only visit small caves once
-        # print('visited:', visited)
+        visited.sort()
+        has_revisit = False
+        for i,v in enumerate(visited):
+            if i == 0: continue
+            if visited[i-1] == v:
+                has_revisit = True
+                break
+
+        # print(path, has_revisit, visited)
 
         for n in M[path[-1]]:
-            if n not in visited:
+            # Add any state as long as there is no state revisited
+            if not has_revisit:
+                # print('can go to', n)
                 new = path.copy()
                 new.append(n)
                 if n == 'end':
                     done.append(new)
                 else:
                     next.append(new)
-            # print('can go to', n)
+            elif n not in visited:
+                new = path.copy()
+                new.append(n)
+                if n == 'end':
+                    done.append(new)
+                else:
+                    next.append(new)
 
-    # print(done, next)
     return done, next
 
 
@@ -68,6 +94,7 @@ last_len = -1
 # while last_len < len(n):
 while len(queue) > 0:
     done, queue = step(queue)
+    # print(len(done[0]), 'completed', done)
     complete.extend(done)
 
 # print(queue)
