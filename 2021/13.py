@@ -34,10 +34,10 @@ for r, c in dots:
 
 
 # Print the paper like in descriptions
-def show():
+def show(blank = "."):
     global G
     for row in G:
-        print("".join(["#" if p else "." for p in row]))
+        print("".join(["#" if p else blank for p in row]))
 
 
 def fold(G, along, pos):
@@ -67,7 +67,7 @@ def fold(G, along, pos):
 
 
 for along, pos in folds:
-    print(f"folding along {along} at {pos}, R={R} C={C}")
+    # print(f"folding along {along} at {pos}, R={R} C={C}")
     G = fold(G, along, pos)
     R = len(G)
     C = len(G[0])
@@ -76,4 +76,4 @@ for along, pos in folds:
 
 print(f"p1={p1}")
 print(f"p2 8 capital letters:")
-show()
+show(' ')
