@@ -47,46 +47,24 @@ def hits_target(dx: int, dy: int):
     return False, positions[-1], hiy
 
 
-# assert hits_target(7, 2)[0]
-# assert hits_target(9, 0)[0]
-# assert not hits_target(17, -4)[0]
-# assert not hits_target(0, 0)[0]
-
+possible = []
 traj_x, traj_y = -1, -1
-old_max_dy = -1
-max_dy = 0
-# while max_dy != old_max_dy:
-for sdy in range(180):  # Arbitrary end
-    old_max_dy = max_dy
-    was_lower = False
-    dx, dy = 0, sdy  # max_dy + 1
-    hit, (x, y), _ = hits_target(dx, dy)
+for dy in range(-300, 180):  # Arbitrary start & end
 
-    while not hit:
-        if x > max_x:
-            # DEB(f"Overshot, not possible with current dy={dy}")
-            break
-
-        if x <= max_x:
-            dx += 1
-            # DEB(x, min_x, f"increasing dx to {dx}")
-
-        # Try again
+    for dx in range(250):  # Guessed number
         hit, (x, y), _ = hits_target(dx, dy)
-        # DEB("launched", (dx, dy), hit)
+        DEB("launched", (dx, dy), hit)
 
-    if hit:
-        traj_x, traj_y = dx, dy
-        max_dy = dy
-        DEB("Possble trajectory with", (dx, dy))
-    else:
-        # DEB(f"Can't hit target with dy={dy}")
-        # break
-        pass
+        if hit:
+            traj_x, traj_y = dx, dy
+            possible.append((dx, dy))
+            DEB("Possble trajectory with", (dx, dy))
 
 DEB(f"Highest dy possible is {traj_y}", (traj_x, traj_y))
 _, _, p1 = hits_target(traj_x, traj_y)
+p2 = len(possible)
+DEB("possible:", possible)
 
 
 print(f"p1={p1}")  # Is 15400, not 55, 3741, 7140 (too low)
-print(f"p2={p2}")
+print(f"p2={p2}")  # Is 5844, not 147, 2302 (too low)
