@@ -49,9 +49,12 @@ def hits_target(dx: int, dy: int):
 
 possible = []
 traj_x, traj_y = -1, -1
-for dy in range(-300, 180):  # Arbitrary start & end
 
-    for dx in range(250):  # Guessed number
+# Minimum dy cannot go past the lowest target y in the first step
+for dy in range(min_y, 180):  # Arbitrary end
+
+    # dx cannot overshoot the target max_x in the first step
+    for dx in range(max_x + 1):
         hit, (x, y), _ = hits_target(dx, dy)
         DEB("launched", (dx, dy), hit)
 
