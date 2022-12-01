@@ -5,13 +5,20 @@ filename = sys.argv[1] if len(sys.argv) > 1 else "1.in"
 p1 = 0
 p2 = 0
 
-candidate = 0
+elves = []
+
+calories = 0
 for line in open(filename):
     if line.strip() == "":
-        p1 = max(p1, candidate)
-        candidate = 0
+        elves.append(calories)
+        calories = 0
         continue
-    candidate += int(line.strip())
+    calories += int(line.strip())
+
+# Push last elf too
+elves.append(calories)
+p1 = max(elves)
+p2 = sum(sorted(elves)[-3:])
 
 
 print(f"p1={p1}")
