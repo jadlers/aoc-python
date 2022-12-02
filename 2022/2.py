@@ -20,6 +20,22 @@ for line in open(filename):
     round = 0
     [op, me] = [x.strip() for x in line.strip().split(" ")]
     play = map.get(me, 0)  # one you play
+
+    chosen = -1
+    if me == "X":  # lose
+        chosen = map[op] - 1
+    elif me == "Y":  # draw
+        chosen = map[op] - 0
+        p2 += 3
+    elif me == "Z":  # win
+        chosen = map[op] - 2
+        p2 += 6
+    if chosen < 1:
+        chosen += 3
+        # print(map[op], chosen)
+
+    p2 += chosen
+
     diff = map[me] - map[op]
     # print(name[map[op]], name[map[me]], diff)
     outcome = 0
@@ -33,5 +49,5 @@ for line in open(filename):
     # print(f"{name[map[op]]} {name[map[me]]}, {play} + {outcome} ({diff}) = {round}")
     p1 += round
 
-print(f"p1={p1}") # 12231, 10893
-print(f"p2={p2}")
+print(f"p1={p1}")  # 12231, 10893
+print(f"p2={p2}")  # 6459
