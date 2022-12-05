@@ -39,10 +39,10 @@ for line in open(filename):
     m, f, t = [int(x) for x in matches.groups()]
     # print(m, f, t)
     # print("move", stacks[f][-m:])
-    for _ in range(m):
-        stacks[t].append(stacks[f].pop())
-    # stacks[t].extend(stacks[f][-m:])
-    # stacks[f] = stacks[f][:-m]
+    # for _ in range(m):
+    #     stacks[t].append(stacks[f].pop())
+    stacks[t].extend(stacks[f][-m:])
+    stacks[f] = stacks[f][:-m]
     # print(stacks[1:4])
 
 p1 = "".join([c.pop() for c in stacks[1:] if len(c) > 0])
