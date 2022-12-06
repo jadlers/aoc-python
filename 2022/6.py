@@ -8,19 +8,27 @@ p2 = 0
 X = [l for l in open(filename)]
 line = X[0]
 
+
+def find_dup(chars: str) -> bool:
+    """`find_dup` return `True` when there's a char in the string which occur
+    more than once, `False` otherwise."""
+    for idx, ch in enumerate(chars[:-1]):
+        if ch in chars[idx + 1 :]:
+            return True
+    return False
+
+
 for i in range(4, len(line)):
-    g1 = line[i-4:i]
-    s1 = set(g1)
-    if not p1 and len(s1) == 4:
-        p1 = i
+    if not p1:
+        g1 = line[i - 4 : i]
+        if not find_dup(g1):
+            p1 = i
     if i < 14:
         continue
-
-    g2 = line[i-14:i]
-    s2 = set(g2)
-    if not p2 and len(s2) == 14:
-        p2 = i
-
+    elif not p2:
+        g2 = line[i - 14 : i]
+        if not find_dup(g2):
+            p2 = i
 
     if p1 and p2:
         break
