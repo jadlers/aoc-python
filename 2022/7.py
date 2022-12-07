@@ -10,7 +10,7 @@ p2 = 0
 def cd(cwd: list[str], arg: str) -> list[str]:
     # note: Do not modify cwd
     if arg == "..":
-        print(cwd, "new path", cwd[:-1])
+        # print(cwd, "new path", cwd[:-1])
         return cwd[:-1]
     else:
         c = cwd.copy()
@@ -39,7 +39,7 @@ for line in X:
         cmd = parts[1]
         arg = parts[2] if len(parts) > 2 else ""
 
-        print(cmd, arg)
+        # print(cmd, arg)
         if cmd == "cd":
             cur = cd(cur, arg)
         elif cmd == "ls":
@@ -64,14 +64,15 @@ for line in X:
         size, name = int(parts[0]), parts[1]
         S[p]["files"][name] = size
 
-for s in S:
-    print(s, S[s])
-print("parsing done")
+# for s in S:
+#     print(s, S[s])
+# print("parsing done")
 
 # sort paths in depths
 dirs = sorted([d for d in S], key=lambda p: p.count("/"), reverse=True)
-print(dirs)
+# print(dirs)
 
+dir_sizes = []
 
 def dir_size(path):
     size = 0
@@ -80,6 +81,7 @@ def dir_size(path):
         subdirs = [f"/{d}" for d in S[path]["dirs"]]
     size += sum([S[sub]["size"] for sub in subdirs])
     size += sum([S[path]["files"][name] for name in S[path]["files"]])
+    dir_sizes.append(size)
     return size
 
 
@@ -92,18 +94,25 @@ for dir in dirs:
 
 S["/"]["size"] = dir_size("/")
 for s in S:
-    print(s, S[s])
+    # print(s, S[s])
     cur = S[s]
     if cur["size"] > 100000:
         continue
 
-    print("adding total:", cur["size"])
+    # print("adding total:", cur["size"])
     p1 += cur["size"]
 
+needed = 30000000 - (70000000 - S["/"]["size"])
+print(needed)
+# print(sorted(dir_sizes))
+for d in sorted(dir_sizes):
+    if d >= needed:
+        p2 = d
+        break
 
 print()
 print(f"p1={p1}")
-print(f"p2={p2}")
+print(f"p2={p2}") # not: 37948890
 
 # def traverse(path):
 #     cur = S["/"]
