@@ -1,5 +1,4 @@
 import sys
-from typing import Self, Any  # From python 3.11
 
 # From Jonathan Paulson
 filename = sys.argv[1] if len(sys.argv) > 1 else "7.in"
@@ -7,82 +6,87 @@ p1 = 0
 p2 = 0
 
 
-def cd(cwd: list[str], arg: str) -> list[str]:
+def cd(dirs: list[str], arg: str) -> list[str]:
     # note: Do not modify cwd
     if arg == "..":
-        # print(cwd, "new path", cwd[:-1])
-        return cwd[:-1]
+        return dirs[:-1]
     else:
-        c = cwd.copy()
+        c = dirs.copy() # Would change list passed otherwise
         c.append(arg)
         return c
 
 
-def path(cwd: list[str]) -> str:
-    return "/" + "/".join(cwd[1:])
+def path(dirs: list[str]) -> str:
+    """`path` take a list of directories from the root, which is `/`, and
+    return the string representation of the path. The `path` will **always**
+    start with `/`.
+
+    Examples:
+    - [] -> "/"
+    - ["a", "b", "c"] -> "/a/b/c"
+    """
+    return "/" + "/".join(dirs[1:])
 
 
-X = [x.strip() for x in open(filename)]
+def dir_size(path):
+    """`dir_size` calculates the size of the directory in the path.
+
+    **Note:** All subdirectories of `path` must have their size correctly set
+    prior to calculating the size for this `path`."""
+    size = 0
+    subdirs = [f"{path}/{d}" for d in S[path]["dirs"]]
+    if path == "/":
+        subdirs = [f"/{d}" for d in S[path]["dirs"]]
+    # NOTE: Could make the size here be calculated if it's None and thus make
+    # it recursive
+    size += sum([S[sub]["size"] for sub in subdirs])
+    size += sum([S[path]["files"][name] for name in S[path]["files"]])
+    dir_sizes.append(size)  # For p2, add to list of dir sizes
+    return size
+
+
 S = {
     "/": {
         "size": 0,
-        "parent": None,
+        "parent": None,  # Never used
         "files": {},  # {"name": "size"}
         "dirs": [],  # ["a", "e"]
     }
 }
 
-cur = []
-for line in X:
+cwd = []
+for line in [x.strip() for x in open(filename)]:
     if line[0] == "$":
         parts = line.split()
         cmd = parts[1]
-        arg = parts[2] if len(parts) > 2 else ""
-
-        # print(cmd, arg)
         if cmd == "cd":
-            cur = cd(cur, arg)
-        elif cmd == "ls":
-            # TODO Go through output
-            pass
+            arg = parts[2]
+            cwd = cd(cwd, arg)
+
+        # We only care about the output from ls which is the only other command
         continue
 
-    # print(cur, "\tout:", line)
     # Only ls output here, know cwd
     parts = line.split()
-    p = path(cur)
+    p = path(cwd)
     if parts[0] == "dir":
         dir_name = parts[1]
         S[p]["dirs"].append(dir_name)
-        S[f"{path(cd(cur, parts[1]))}"] = {
+        S[f"{path(cd(cwd, parts[1]))}"] = {
             "size": 0,
             "parent": p,
             "files": {},
             "dirs": [],
         }
-    else:
+    else:  # It's a file
         size, name = int(parts[0]), parts[1]
         S[p]["files"][name] = size
 
-# for s in S:
-#     print(s, S[s])
-# print("parsing done")
-
-# sort paths in depths
+# sort paths on depth in descending order to make sure the correct total size
+# will be calculated. Read documentation for `dir_size` for more information.
+# We always want to calculate for the root last.
 dirs = sorted([d for d in S], key=lambda p: p.count("/"), reverse=True)
-# print(dirs)
-
 dir_sizes = []
-
-def dir_size(path):
-    size = 0
-    subdirs = [f"{path}/{d}" for d in S[path]["dirs"]]
-    if path == "/":
-        subdirs = [f"/{d}" for d in S[path]["dirs"]]
-    size += sum([S[sub]["size"] for sub in subdirs])
-    size += sum([S[path]["files"][name] for name in S[path]["files"]])
-    dir_sizes.append(size)
-    return size
 
 
 for dir in dirs:
@@ -94,82 +98,26 @@ for dir in dirs:
 
 S["/"]["size"] = dir_size("/")
 for s in S:
-    # print(s, S[s])
     cur = S[s]
     if cur["size"] > 100000:
         continue
 
-    # print("adding total:", cur["size"])
     p1 += cur["size"]
 
-needed = 30000000 - (70000000 - S["/"]["size"])
-print(needed)
-# print(sorted(dir_sizes))
-for d in sorted(dir_sizes):
-    if d >= needed:
-        p2 = d
-        break
+# P2
+REQUIRED = 30000000
+ENTIRE_DISK = 70000000
+current_usage = S["/"]["size"]
+needed = REQUIRED - (ENTIRE_DISK - current_usage)
+
+# Kind of like find in js
+# See: https://stackoverflow.com/a/10302859
+p2 = next((x for x in sorted(dir_sizes) if x >= needed), None)
+
+# TODO: Remove, keep while refactoring
+assert p1 == 1307902
+assert p2 == 7068748
 
 print()
 print(f"p1={p1}")
-print(f"p2={p2}") # not: 37948890
-
-# def traverse(path):
-#     cur = S["/"]
-#     for dir in path[1:].split("/")[1:]:
-#         print(f"traversing '{dir}'")
-#         if dir in cur:
-#             cur = dir
-#         else:
-#             cur[dir] = {}
-
-#     print(S, cur)
-
-
-# class FileTree:
-#     parent: Self = None
-#     name = ""
-#     size = 0
-#     # Shouldn't differ I know
-#     dirs = {}  # {"a": FileTree}
-#     files = {}
-
-#     def __init__(self, parent, name, size=0):
-#         self.parent: Self @ FileTree = parent
-#         self.name = name
-#         self.size = size
-
-#     def __str__(self):
-#         dir_names = [k for k in self.dirs]
-#         return f"{self.parent} | {self.size} | dirs={dir_names}"
-
-#     def path(self):
-#         t = self
-#         p = []
-#         while t.parent != None:
-#             break
-
-#     def cd(self, arg):
-#         if arg == "/":
-#             return self  # Only first line
-
-#         if arg == "..":
-#             return self.parent
-#         elif arg in self.dirs:
-#             new = self.dirs[arg]
-#             print("new", new, new.parent)
-#             return new
-
-#         assert False
-
-#     def mkdir(self, name):
-#         new_dir = FileTree(parent=self, name=name)
-#         print(f"created dir ({new_dir})")
-#         self.dirs[name] = new_dir
-
-#     def touch(self, name, size):
-#         self.files[name] = FileTree(name, self, size)
-
-
-# root = FileTree(None, "/")
-# C = root
+print(f"p2={p2}")  # not: 37948890
