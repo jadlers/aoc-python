@@ -27,11 +27,36 @@ def visible(r, c, val):
     return False
 
 
+def distances(r, c, val):
+    seen = [0, 0, 0, 0]
+    for i, dir in enumerate(dirs):
+        dr, dc = dir
+        r_, c_ = r, c
+
+        while (0 <= r_+dr < height) and (0 <= c_+dc < width):
+            r_ += dr
+            c_ += dc
+            if M[r_][c_] <= val:
+                seen[i] += 1
+            elif M[r_][c_] == val:
+                seen[i] += 1
+                break
+            else:
+                break
+
+    print((r,c), seen)
+    res = 1
+    for d in seen:
+        res *= d
+    return res
+
+
 for r, row in enumerate(M):
     print(r, row)
 print()
 
 n = 0
+candidates = []
 for r, row in enumerate(M):
     for c, num in enumerate(row):
         if r == 0 or r == height - 1:
@@ -45,6 +70,10 @@ for r, row in enumerate(M):
         if visible(r, c, num):
             print(num, r, c)
             p1 += 1
+
+        candidates.append(distances(r,c,num))
+
+p2 = max(candidates)
 
 
 assert n == (width * height) - (width * 2) - (height * 2) + 4
