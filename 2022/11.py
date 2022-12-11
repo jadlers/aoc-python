@@ -1,4 +1,5 @@
 import sys
+from math import lcm
 
 # From Jonathan Paulson
 filename = sys.argv[1] if len(sys.argv) > 1 else "11.in"
@@ -9,15 +10,20 @@ X = [x.strip() for x in open(filename)]
 
 
 def do_op(old, op, rhs):
+    global MAX
     if rhs == "old":
         rhs = old
 
     rhs = int(rhs)
     assert op in ["*", "+"], op
-    return old * rhs if op == "*" else old + rhs
+    new = old * rhs if op == "*" else old + rhs
+    new = new % MAX
+    return new
+
 
 M = []
 m = {}
+divs = set()
 for i in range(0, len(X), 7):
     m = {}
     items = X[i + 1].split()
@@ -32,6 +38,7 @@ for i in range(0, len(X), 7):
 
     div = int(X[i + 3].split().pop())
     m["div"] = div
+    divs.add(div)
 
     truthy = int(X[i + 4].split().pop())
     falsy = int(X[i + 5].split().pop())
@@ -41,9 +48,13 @@ for i in range(0, len(X), 7):
     # print(X[i], m)
     M.append(m)
 
+MAX = lcm(*divs)
+print("lcm:", MAX)
 
 # Let's start the game
 throws = [0 for _ in range(len(M))]
+
+
 def round():
     global M
     for m_idx, m in enumerate(M):
@@ -52,18 +63,18 @@ def round():
         m["items"] = []
         for i in items:
             new_i = do_op(i, m["op"], m["num"])
-            new_i = new_i // 3
             if new_i % m["div"] == 0:
+                # print(new_i, m["div"])
                 M[m["truthy"]]["items"].append(new_i)
             else:
                 M[m["falsy"]]["items"].append(new_i)
 
-for i in range(20):
+
+for i in range(10000):
     round()
 
-throws.sort()
-# print(sorted(throws))
-p1 = throws[-2] * throws[-1]
+m1, m2 = sorted(throws)[-2:]
+p2 = m1 * m2
 
 print(f"p1={p1}")
 print(f"p2={p2}")
