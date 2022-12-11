@@ -1,4 +1,5 @@
 import sys
+from copy import deepcopy
 from math import lcm
 
 # From Jonathan Paulson
@@ -16,9 +17,7 @@ def do_op(old, op, rhs):
 
     rhs = int(rhs)
     assert op in ["*", "+"], op
-    new = old * rhs if op == "*" else old + rhs
-    new = new % MAX
-    return new
+    return old * rhs if op == "*" else old + rhs
 
 
 M = []
@@ -49,13 +48,14 @@ for i in range(0, len(X), 7):
     M.append(m)
 
 MAX = lcm(*divs)
-print("lcm:", MAX)
+# print("lcm:", MAX)
 
 # Let's start the game
+INIT = deepcopy(M)
 throws = [0 for _ in range(len(M))]
 
 
-def round():
+def round(part):
     global M
     for m_idx, m in enumerate(M):
         items = m["items"].copy()
@@ -63,6 +63,10 @@ def round():
         m["items"] = []
         for i in items:
             new_i = do_op(i, m["op"], m["num"])
+            if part == 1:
+                new_i = new_i // 3
+            elif part == 2:
+                new_i %= MAX
             if new_i % m["div"] == 0:
                 # print(new_i, m["div"])
                 M[m["truthy"]]["items"].append(new_i)
@@ -70,11 +74,11 @@ def round():
                 M[m["falsy"]]["items"].append(new_i)
 
 
-for i in range(10000):
-    round()
+for part in [1, 2]:
+    M = deepcopy(INIT)
+    throws = [0 for _ in range(len(M))]
+    for i in range(20 if part == 1 else 10000):
+        round(part)
 
-m1, m2 = sorted(throws)[-2:]
-p2 = m1 * m2
-
-print(f"p1={p1}")
-print(f"p2={p2}")
+    m1, m2 = sorted(throws)[-2:]
+    print(f"p{part}={m1*m2}")
