@@ -45,8 +45,8 @@ visited = set()  # of coords (r,c)
 q = [S]
 
 print(S, E)
-for row in M:
-    print(row)
+# for row in M:
+#     print(row)
 
 
 def step():
@@ -83,13 +83,36 @@ def dist_map(distances):
         print(row)
 
 
+# P1
 while True:
     found = step()
     if found:
         # print(dist_to)
         p1 = found
-        dist_map(dist_to)
+        # dist_map(dist_to)
         break
+
+# P2
+starts = []
+p2 = 1e9
+for r in range(HEIGHT):
+    for c in range(WIDTH):
+        if M[r][c] == 0:
+            starts.append((r, c))
+
+for s in starts:
+    next = 0
+    q = [s]
+    dist_to = {s: 0}  # defaultdict? (r,c) -> dist
+    visited = set()  # of coords (r,c)
+    while True:
+        try:
+            found = step()
+            if found:
+                p2 = min(p2, found)
+                break
+        except:
+            break
 
 print(f"p1={p1}")
 print(f"p2={p2}")
