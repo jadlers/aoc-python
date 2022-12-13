@@ -1,9 +1,10 @@
 import sys
+import functools
 
 # From Jonathan Paulson
 filename = sys.argv[1] if len(sys.argv) > 1 else "13.in"
 p1 = 0
-p2 = 0
+p2 = 1
 
 
 data = open(filename).read().strip()
@@ -28,11 +29,11 @@ def comp(a, b):
         elif type(e1) == list:  # Both lists
             ret = comp(e1, e2)
         elif e1 < e2:
-            print("correect - left smaller!")
-            return True  # Found it
+            # print("correect - left smaller!")
+            return -1  # Found it
         elif e2 < e1:
-            print("NOPE - right smaller!")
-            return False
+            # print("NOPE - right smaller!")
+            return 1
 
         if ret != None:
             return ret
@@ -40,24 +41,34 @@ def comp(a, b):
     la = len(a)
     lb = len(b)
     if la < lb:
-        print("correect - left smaller")
-        return True
+        # print("correect - left smaller")
+        return -1
     elif la > lb:
-        print("NOPE - right side is smaller")
-        return False
+        # print("NOPE - right side is smaller")
+        return 1
 
     return ret
 
 
+pks = [[[2]], [[6]]]  # Add divider packets
 for i, packet in enumerate(data.split("\n\n")):
     i += 1
     a, b = [eval(p.strip()) for p in packet.split("\n")]
-    print(a, b)
+    pks.append(a)
+    pks.append(b)
+
     ret = comp(a, b)
-    if ret:
-        p1 += i
     assert ret != None
-    print(ret)
+    if ret == -1:
+        p1 += i
+
+sort_key = functools.cmp_to_key(comp)
+for i, p in enumerate(sorted(pks, key=sort_key)):
+    i += 1
+    if p == [[2]]:
+        p2 *= i
+    elif p == [[6]]:
+        p2 *= i
 
 print(f"p1={p1}")  # Not: 5930
 print(f"p2={p2}")
