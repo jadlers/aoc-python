@@ -35,20 +35,24 @@ for i, line in enumerate(X):
         max_c = max(max_c, c)
         max_r = max(max_r, r)
 
-
 print(min_c, max_c, max_r)
+FLOOR = max_r + 2
 
 
-def pmap():
+def pmap(left=0, right=0):
     global M
     print(min_c, max_c)
-    for r in range(max_r + 1):
+    for r in range(max_r + 2):
         print(
             # f"{r+1} ",
             "".join(
-                [M[(r, c)] if (r, c) in M else "." for c in range(min_c, max_c + 1)]
+                [
+                    M[(r, c)] if (r, c) in M else "."
+                    for c in range(min_c - left, max_c + 1 + right)
+                ]
             ),
         )
+    print("#" * (max_c - min_c + left + right + 1))
 
 
 D = [(1, 0), (1, -1), (1, 1)]  # (r,c), down, down-left, down-right
@@ -60,25 +64,35 @@ def drop():
     grain = (0, 500)
     while True:
         r, c = grain
+
+        if r == FLOOR:
+            return True
+        elif (0, 500) in M:
+            print("filled")
+            return False  # filled to top
         for dr, dc in D:
-            if (r+dr, c+dc) not in M: # Free to be placed there
-                grain = (r+dr, c+dc)
+            rr = r + dr
+            cc = c + dc
+            if (rr, cc) not in M and rr != FLOOR:  # Free to be placed there
+                grain = (rr, cc)
                 # print("grain moved", (r+dr, c+dc))
                 break
-        if (r,c) == grain: # it's found a place to stay
-            M[(r,c)] = "o"
+        if (r, c) == grain:  # it's found a place to stay
+            M[(r, c)] = "o"
             return True
-        elif grain[0] > max_r:
-            return False  # Could not drop
+
+        # Part 1
+        # elif grain[0] > max_r:
+        #     return False  # Could not drop
 
 
 while True:
+# for i in range(100):
     success = drop()
     if not success:
         print("could not drop grain number")
         break
-    # if i % 5 == 0:
-    #     pmap()
+    # pmap(5, 5)
 
 pmap()
 for coord in M:
