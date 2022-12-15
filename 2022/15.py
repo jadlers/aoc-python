@@ -3,58 +3,62 @@ import re
 
 # From Jonathan Paulson
 filename = sys.argv[1] if len(sys.argv) > 1 else "15.in"
+example_input = filename == "15.ex"
 p1 = 0
 p2 = 0
 data = open(filename).read().strip()
 X = [x.strip() for x in open(filename)]
 
-digits = re.compile(r"\d+")
-rows = {}
+max_xy = 20 if example_input else 4000000
+rows = [[] for _ in range(max_xy + 1)]
 
-max_mh = 0
-min_r = 0
-max_r = 0
-min_c = 0
-max_c = 0
-sensor = []
-beacon = []
-dists = []
+special_r = 10 if example_input else 2000000
+special = set()  # Used to get P1 `r`
 
-r = 10 if filename == "15.ex" else 2000000
-special = set()
+M = [["." for _ in range(21)] for _ in range(21)]
+
 
 for i, line in enumerate(X):
-    # print(f"line {i} out of {len(X)}")
+    print(f"line {i} out of {len(X)}")
     sc, sr, bc, br = [int(x) for x in re.findall(r"\d+", line)]
     dr = abs(sr - br)
     dc = abs(sc - bc)
     mh = dr + dc
-    sensor.append((sr, sc))
-    beacon.append((br, bc))
-    dists.append(mh)
+    if 0 <= sr <= 20 and 0 <= sc <= 20:
+        M[sr][sc] = "S"
+    if 0 <= br <= 20 and 0 <= bc <= 20:
+        M[br][bc] = "B"
 
-    min_r = min(min_r, sr)
-    max_r = max(max_r, sr)
-    min_c = min(min_c, sc)
-    max_c = max(max_c, sc)
-    max_mh = max(max_mh, mh)
+    # Goes through the special row for P1
+    # How to generalize and do similar for every row?
+    for r in range(sr - mh, sr + mh + 1):
+        if not (0 <= r <= max_xy):
+            continue
 
-    # print((sr, sc), "from", sr - dr, "to", sr + dr)
-    # if sr == 11 and sc == 0:
-    #     print("missing", (sr - mh), r, (sr + mh))
-
-    if (sr - mh) <= r <= (sr + mh):
-        # print((sr, sc), f"touch special row ({r}) with mh: {mh}")
+        # How far from sensor the current row is
         v_dist = abs(sr - r)
         # print(f"vert dist to {r}:", v_dist)
         cov_start = sc - (mh - v_dist)
         cov_end = sc + (mh - v_dist)
-        # print(cov_start, cov_end)
-        for covered in range(cov_start, cov_end):
-            # print("adding", covered)
-            special.add(covered)
-        if cov_start == cov_end:  # Does this happen?
-            special.add(cov_start)
+        assert mh >= v_dist, f"mh={mh} v_dist={v_dist}"
+
+        if r == 0:
+            print("touches row 0", (sr,sc), mh, v_dist, )
+
+        if example_input and (7, 8) == (sr, sc):
+            for c in range(max(0, cov_start), min(21, cov_end + 1)):
+                if M[r][c] == ".":
+                    M[r][c] = "#"
+
+        rows[r].append((max(0, cov_start), min(cov_end, max_xy)))
+
+        # For calculating P1, can probably be updated once P2 is complete
+        if r == special_r:
+            for covered in range(cov_start, cov_end):
+                # print("adding", covered)
+                special.add(covered)
+            if cov_start == cov_end:  # Does this happen?
+                special.add(cov_start)
 
         # print("row dist to special row", abs(sr - mh), abs(abs(sr - mh) - r))
 
@@ -62,11 +66,49 @@ for i, line in enumerate(X):
     #     print("This:")
     # print((sr, sc), (br, bc), (dr, dc), mh)  # Only care about dr for now
 
+# Only print on example, real is way too big
+if example_input:
+    for i, Mr in enumerate(M):
+        print("".join(Mr), i)
+
+
+def find_beacon(row, cr):
+    rs = None  # row start (x value on row y)
+    ce = 0  # current end
+    for s, e in row:
+        # print(s, e, ce)
+        if rs == None:  # First coverage tuple
+            assert s == 0, f"{s} {row}"
+            rs = s
+            ce = e
+            continue
+        if s > ce:
+            print(ord_row)
+            print("found it!", (cr, ce + 1))
+            return (cr, ce + 1)
+            # print((ce + 1) * 4000000 + cr)
+            # assert False
+        ce = max(ce, e)
+
+
+candidates = []
+for cr in range(0, 400_000):  # max_r):
+    if cr % 10_000 == 0:
+        print("on row", cr)
+
+    ord_row = sorted(rows[cr], key=lambda x: x[0])
+    candidate = find_beacon(ord_row, cr)
+    if candidate:
+        print(candidate)
+        p2 = candidate[1] * 4_000_000 + candidate[0]
+        break
+        # candidates.append(candidate)
+    # print(ord_row)
+
+
+# print(candidates)
 
 # Draw edges of areas covered? Or go through each point on a line within the max_mh?
-
-print(f"r: {min_r} -> {max_r}, c: {min_c} -> {max_c}")
-print(max_mh)
 
 # Go through all points on the row we're looking at
 # r = 2000000 if filename == "15.in" else 10
@@ -128,4 +170,10 @@ print(max_mh)
 p1 = len(special)
 # print(special)
 print(f"p1={p1}")  # Not: 5387315, 5387314, 3769203, 3769204
-print(f"p2={p2}")
+if example_input:
+    assert p1 == 26
+else:
+    assert p1 == 4985193
+print(f"p2={p2}")  # Not: 2622236000000
+if example_input:
+    assert p2 == 56000011
