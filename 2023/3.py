@@ -22,12 +22,9 @@ M = defaultdict(int)
 S = []
 
 for r, line in enumerate(X):
-    print(line)
-
     # Parse out numbers with position
     c = 0
-    m = True
-    while m and c < C:
+    while c < C:
         m = rdigit.search(line, c)
         if not m:
             break
@@ -41,8 +38,7 @@ for r, line in enumerate(X):
 
     # Parse out symbols with position
     c = 0
-    m = True
-    while m and c < C:
+    while c < C:
         m = rsymbol.search(line, c)
         if not m:
             break
@@ -56,6 +52,7 @@ include = [False for _ in N]
 
 # Go through all symbols and mark adjacent numbers as included
 for (r, c) in S:
+    matched: set[int] = set()
     for dr in [-1, 0, 1]:
         for dc in [-1, 0, 1]:
             rr = r + dr
@@ -66,18 +63,17 @@ for (r, c) in S:
             # mark number as included
             adj_num = M.get((rr, cc))
             if adj_num is not None:
-                # print((r, c), X[r][c], (rr, cc), N[adj_num])
                 include[adj_num] = True
+                if X[r][c] == "*":
+                    matched.add(adj_num)
+    # p2
+    if len(matched) == 2:
+        n1, n2 = N[matched.pop()], N[matched.pop()]
+        p2 += n1 * n2
 
 
 parts = [x for i, x in enumerate(N) if include[i]]
-print(parts)
 p1 = sum(parts)
-
-# print(N)
-# print(M)
-# print(S)
-# print(R, C)
 
 
 print(p1)
